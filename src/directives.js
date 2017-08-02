@@ -117,6 +117,24 @@ angular.module('oi.select')
 
                 var unbindFocusBlur = oiUtils.bindFocusBlur(element, inputElement);
 
+                scope.listScrollLimit = options.infiniteScrollLimit
+
+                var listElementScrollHandler = _.throttle(function (event) {
+                    var element = event.target
+                    var listScrollHeight = element.scrollHeight
+                    var currentListScroll = element.scrollTop + element.clientHeight
+                    if (currentListScroll + options.infiniteScrollDistance > listScrollHeight) {
+                        scope.listScrollLimit += options.infiniteScrollLimit
+                    }
+                }, options.infiniteScrollThrottle)
+
+                if (options.infiniteScroll) {
+                    listElement[0].addEventListener("scroll", listElementScrollHandler)
+                    scope.$on('$destroy', function() {
+                      listElement[0].removeEventListener('scroll', listElementScrollHandler, true)
+                    })
+                }
+
                 if (angular.isDefined(attrs.autofocus)) {
                     $timeout(function() {
                         inputElement[0].focus();

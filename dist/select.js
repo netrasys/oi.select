@@ -12,14 +12,18 @@ angular.module('oi.select')
             editItem:       false,
             newItem:        false,
             closeList:      true,
+            infiniteScroll: false,
+            infiniteScrollLimit: Number.MAX_SAFE_INTEGER,
+            infiniteScrollDistance: 300,
+            infiniteScrollThrottle: 250,
             saveTrigger:    'enter tab blur',
             minlength:      0
         },
         version: {
-            full: '0.2.21',
+            full: '0.3.2',
             major: 0,
-            minor: 2,
-            dot: 21
+            minor: 3,
+            dot: 2
         },
         $get: function() {
             return {
@@ -452,6 +456,24 @@ angular.module('oi.select')
                 }
 
                 var unbindFocusBlur = oiUtils.bindFocusBlur(element, inputElement);
+
+                scope.listScrollLimit = options.infiniteScrollLimit
+
+                var listElementScrollHandler = _.throttle(function (event) {
+                    var element = event.target
+                    var listScrollHeight = element.scrollHeight
+                    var currentListScroll = element.scrollTop + element.clientHeight
+                    if (currentListScroll + options.infiniteScrollDistance > listScrollHeight) {
+                        scope.listScrollLimit += options.infiniteScrollLimit
+                    }
+                }, options.infiniteScrollThrottle)
+
+                if (options.infiniteScroll) {
+                    listElement[0].addEventListener("scroll", listElementScrollHandler)
+                    scope.$on('$destroy', function() {
+                      listElement[0].removeEventListener('scroll', listElementScrollHandler, true)
+                    })
+                }
 
                 if (angular.isDefined(attrs.autofocus)) {
                     $timeout(function() {

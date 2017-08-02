@@ -11,14 +11,18 @@ angular.module('oi.select')
             editItem:       false,
             newItem:        false,
             closeList:      true,
+            infiniteScroll: false,
+            infiniteScrollLimit: Number.MAX_SAFE_INTEGER,
+            infiniteScrollDistance: 300,
+            infiniteScrollThrottle: 250,
             saveTrigger:    'enter tab blur',
             minlength:      0
         },
         version: {
-            full: '0.2.21',
+            full: '0.3.2',
             major: 0,
-            minor: 2,
-            dot: 21
+            minor: 3,
+            dot: 2
         },
         $get: function() {
             return {
