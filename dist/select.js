@@ -12,10 +12,6 @@ angular.module('oi.select')
             editItem:       false,
             newItem:        false,
             closeList:      true,
-            infiniteScroll: false,
-            infiniteScrollLimit: Number.MAX_SAFE_INTEGER,
-            infiniteScrollDistance: 300,
-            infiniteScrollThrottle: 250,
             saveTrigger:    'enter tab blur',
             minlength:      0
         },
@@ -99,6 +95,7 @@ angular.module('oi.select')
             if (event && event.target.nodeName !== 'INPUT') return; //for IE
 
             isBlur = false;
+            isFocused = false;
 
             if (isMousedown) {
                 isBlur = true;
@@ -408,7 +405,6 @@ angular.module('oi.select')
                 // Override the standard $isEmpty because an empty array means the input is empty.
                 ctrl.$isEmpty = function(value) { return !exists(value) };
 
-
                 var inputElement        = element.find('input'),
                     listElement         = angular.element(element[0].querySelector('.select-dropdown')),
                     placeholder         = placeholderFn(scope),
@@ -419,8 +415,6 @@ angular.module('oi.select')
                     editItem            = options.editItem,
                     editItemIsCorrected = editItem === 'correct',
                     waitTime            = 0;
-
-                scope.listScrollLimit = options.infiniteScrollLimit
 
                 if (editItem === true || editItem === 'correct') {
                     editItem = 'oiSelectEditItem';
@@ -459,16 +453,6 @@ angular.module('oi.select')
 
                 var unbindFocusBlur = oiUtils.bindFocusBlur(element, inputElement);
 
-                var listElementScrollHandler = _.throttle(function (event) {
-                    let element = event.target
-                    let listScrollHeight = element.scrollHeight
-                    let currentListScroll = element.scrollTop + element.clientHeight
-                    // console.log("scroll top:", listScrollTop, "scroll height:", listScrollHeight);
-                    if (currentListScroll + options.infiniteScrollDistance > listScrollHeight) {
-                        scope.listScrollLimit += options.infiniteScrollLimit
-                    }
-                }, options.infiniteScrollThrottle)
-
                 if (angular.isDefined(attrs.autofocus)) {
                     $timeout(function() {
                         inputElement[0].focus();
@@ -482,14 +466,6 @@ angular.module('oi.select')
                 if (angular.isDefined(attrs.tabindex)) {
                     inputElement.attr('tabindex', attrs.tabindex);
                     element[0].removeAttribute('tabindex');
-                }
-
-                if (options.infiniteScroll) {
-                    console.log("infinite scroll enabled");
-                    listElement[0].addEventListener("scroll", listElementScrollHandler)
-                    scope.$on('$destroy', function() {
-                      listElement[0].removeEventListener('scroll', listElementScrollHandler, true)
-                    })
                 }
 
                 if (options.maxlength) {
@@ -799,6 +775,7 @@ angular.module('oi.select')
 
                 scope.getDisableWhen = getDisableWhen;
 
+
                 resetMatches();
 
                 element[0].addEventListener('click', click, true); //triggered before add or delete item event
@@ -864,7 +841,6 @@ angular.module('oi.select')
 
                 function blur(event) {
                     scope.isFocused = false;
-                    scope.listScrollLimit = options.infiniteScrollLimit
 
                     if (!multiple) {
                         restoreInput();
