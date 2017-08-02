@@ -523,6 +523,7 @@ angular.module('oi.select')
 
                 function blur(event) {
                     scope.isFocused = false;
+                    scope.listScrollLimit = options.infiniteScrollLimit
 
                     if (!multiple) {
                         restoreInput();

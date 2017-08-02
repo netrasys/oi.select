@@ -20,10 +20,10 @@ angular.module('oi.select')
             minlength:      0
         },
         version: {
-            full: '0.3.3',
+            full: '0.3.2',
             major: 0,
             minor: 3,
-            dot: 3
+            dot: 2
         },
         $get: function() {
             return {
@@ -863,6 +863,7 @@ angular.module('oi.select')
 
                 function blur(event) {
                     scope.isFocused = false;
+                    scope.listScrollLimit = options.infiniteScrollLimit
 
                     if (!multiple) {
                         restoreInput();
